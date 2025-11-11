@@ -37,94 +37,124 @@ export default function Home() {
     return () => window.removeEventListener("resize", checkScreen);
   }, []);
 
-  const nextPage = () => {
-    bookRef.current?.pageFlip()?.flipNext?.();
-  };
+  const nextPage = () => bookRef.current?.pageFlip()?.flipNext?.();
+  const prevPage = () => bookRef.current?.pageFlip()?.flipPrev?.();
 
-  const prevPage = () => {
-    bookRef.current?.pageFlip()?.flipPrev?.();
-  };
-
-  // Tentukan ukuran dinamis
-  const bookWidth = isMobile ? 340 : 900;
-  const bookHeight = isMobile ? 480 : 1280;
+  // 📏 Ukuran besar: hampir fullscreen
+  const bookWidth = isMobile ? 360 : window.innerWidth * 0.30;
+  const bookHeight = isMobile ? 520 : window.innerHeight * 0.85;
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4 md:p-8 overflow-hidden">
-      <h1 className="text-2xl md:text-3xl font-bold mb-4 text-gray-800 text-center">
-        📘 Guidebook Kompetisi Konten Kreator
-      </h1>
+    <main className="flex flex-col items-center justify-center min-h-screen bg-gray-100 py-8 overflow-hidden">
 
-      {/* Buku Flip */}
-      <div className="shadow-2xl rounded-xl bg-white flex flex-col items-center">
-      <HTMLFlipBook
-        ref={bookRef}
-        width={bookWidth}
-        height={bookHeight}
-        size="stretch"
-        minWidth={300}
-        maxWidth={1200}
-        minHeight={400}
-        maxHeight={1600}
-        showCover={true}
-        className="rounded-xl"
-        mobileScrollSupport={true}
-        usePortrait={true}
-        style={{
-          backgroundColor: "white",
-          boxShadow: "0 0 40px rgba(0,0,0,0.15)",
-        }}
-        startPage={0}
-        drawShadow={true}
-        flippingTime={1000}
-        startZIndex={10}
-        autoSize={true}
-        clickEventForward={true}
-        useMouseEvents={true}
-        swipeDistance={30}
-        showPageCorners={true}
-        disableFlipByClick={false}
-        maxShadowOpacity={0.5}
-      >
-        {pages.map((page, index) => (
-          <div
-            key={index}
-            className="flex items-center justify-center bg-white"
+      {/* Buku Flip fullscreen-ish */}
+      <div className="shadow-2xl rounded-2xl bg-white flex flex-col items-center justify-center">
+        <div
+          className="relative flex items-center justify-center"
+          style={{
+            width: isMobile ? "95vw" : "30vw",
+            height: isMobile ? "70vh" : "85vh",
+          }}
+        >
+          <HTMLFlipBook
+            ref={bookRef}
+            width={bookWidth}
+            height={bookHeight}
+            size="fixed"
+            minWidth={300}
+            maxWidth={2500}
+            minHeight={400}
+            maxHeight={3000}
+            showCover={true}
+            mobileScrollSupport={true}
+            usePortrait={true}
+            drawShadow={true}
+            flippingTime={1000}
+            clickEventForward={true}
+            useMouseEvents={true}
+            swipeDistance={30}
+            showPageCorners={true}
+            disableFlipByClick={false}
+            style={{
+              backgroundColor: "white",
+              boxShadow: "0 0 60px rgba(0,0,0,0.15)",
+              borderRadius: "1rem",
+            }}
           >
-            <Image
-              src={page}
-              alt={`Halaman ${index + 1}`}
-              width={bookWidth * 2}
-              height={bookHeight * 2}
-              className="object-contain w-full h-auto select-none"
-              priority={index === 0}
-              quality={100}
-            />
-          </div>
-        ))}
-      </HTMLFlipBook>
-
+            {pages.map((page, index) => (
+              <div key={index} className="flex items-center justify-center bg-white">
+                <Image
+                  src={page}
+                  alt={`Halaman ${index + 1}`}
+                  width={bookWidth * 2}
+                  height={bookHeight * 2}
+                  className="object-contain w-full h-full select-none"
+                  priority={index === 0}
+                  quality={100}
+                />
+              </div>
+            ))}
+          </HTMLFlipBook>
+        </div>
       </div>
 
-      {/* Tombol Navigasi Selalu Aktif */}
-      <div className="flex gap-6 mt-6 flex-wrap justify-center">
+      {/* Tombol Navigasi */}
+      <div className="flex gap-8 mt-10 flex-wrap justify-center">
+        {/* Sebelumnya */}
         <button
           onClick={prevPage}
-          className="px-5 py-2 rounded-xl transition bg-gray-700 text-white hover:bg-gray-800"
+          className="group relative inline-flex overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-2 focus:ring-[#343684]/40 focus:ring-offset-2 focus:ring-offset-slate-50"
         >
-          ⬅️ Sebelumnya
+          <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-gradient-to-r from-[#343684] via-[#660D41] to-[#343684]"></span>
+          <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-white px-10 py-4 text-base font-medium backdrop-blur-3xl transition-all duration-300 group-hover:bg-white/90">
+            <svg
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              fill="none"
+              className="mr-3 h-6 w-6 text-[#343684] transition-transform duration-300 group-hover:-translate-x-1"
+            >
+              <path
+                d="M11 19l-7-7 7-7M19 19l-7-7 7-7"
+                strokeWidth="2"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              ></path>
+            </svg>
+            <span className="relative bg-gradient-to-r from-[#343684] via-[#660D41] to-[#343684] bg-clip-text text-transparent font-semibold">
+              Sebelumnya
+            </span>
+          </span>
         </button>
 
+        {/* Selanjutnya */}
         <button
           onClick={nextPage}
-          className="px-5 py-2 rounded-xl transition bg-blue-600 text-white hover:bg-blue-700"
+          className="group relative inline-flex overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-2 focus:ring-[#660D41]/40 focus:ring-offset-2 focus:ring-offset-slate-50"
         >
-          Selanjutnya ➡️
+          <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-gradient-to-r from-[#660D41] via-[#343684] to-[#660D41]"></span>
+          <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-white px-10 py-4 text-base font-medium backdrop-blur-3xl transition-all duration-300 group-hover:bg-white/90">
+            <span className="relative bg-gradient-to-r from-[#660D41] via-[#343684] to-[#660D41] bg-clip-text text-transparent font-semibold">
+              Selanjutnya
+            </span>
+            <svg
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              fill="none"
+              className="ml-3 h-6 w-6 text-[#660D41] transition-transform duration-300 group-hover:translate-x-1"
+            >
+              <path
+                d="M13 5l7 7-7 7M5 5l7 7-7 7"
+                strokeWidth="2"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              ></path>
+            </svg>
+          </span>
         </button>
       </div>
 
-      <p className="mt-4 text-gray-600 text-sm text-center">
-        Geser atau klik tombol untuk membuka halaman 📖
+      <p className="mt-8 text-gray-600 text-base text-center">
+        Geser atau klik tombol untuk membuka halaman
       </p>
 
       <style jsx global>{`
@@ -134,6 +164,11 @@ export default function Home() {
         }
         canvas {
           touch-action: pan-y;
+        }
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
         }
       `}</style>
     </main>
