@@ -1,65 +1,162 @@
+"use client";
+
+import { useRef, useState, useEffect } from "react";
+import HTMLFlipBook from "react-pageflip";
 import Image from "next/image";
 
 export default function Home() {
+  const pages = [
+    "/guidebook/page1.svg",
+    "/guidebook/page2.svg",
+    "/guidebook/page3.svg",
+    "/guidebook/page4.svg",
+    "/guidebook/page5.svg",
+    "/guidebook/page6.svg",
+    "/guidebook/page7.svg",
+    "/guidebook/page8.svg",
+    "/guidebook/page9.svg",
+    "/guidebook/page10.svg",
+    "/guidebook/page11.svg",
+    "/guidebook/page12.svg",
+    "/guidebook/page13.svg",
+    "/guidebook/page14.svg",
+    "/guidebook/page15.svg",
+    "/guidebook/page16.svg",
+    "/guidebook/page17.svg",
+    "/guidebook/page18.svg",
+  ];
+
+  const bookRef = useRef<any>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Deteksi layar mobile
+  useEffect(() => {
+    const checkScreen = () => setIsMobile(window.innerWidth <= 768);
+    checkScreen();
+    window.addEventListener("resize", checkScreen);
+    return () => window.removeEventListener("resize", checkScreen);
+  }, []);
+
+  // Update halaman aktif setiap kali flip dilakukan
+  useEffect(() => {
+    const flipInstance = bookRef.current?.pageFlip();
+    if (!flipInstance) return;
+
+    const updatePage = () => {
+      const current = bookRef.current?.pageFlip()?.getCurrentPageIndex?.();
+      if (typeof current === "number") setCurrentPage(current);
+    };
+
+    // Delay untuk memastikan flipbook siap
+    const timer = setTimeout(() => {
+      updatePage(); // sinkronisasi awal
+      flipInstance.on("flip", updatePage);
+    }, 300);
+
+    // Cleanup listener
+    return () => {
+      clearTimeout(timer);
+      flipInstance?.off?.("flip", updatePage);
+    };
+  }, []);
+
+  const nextPage = () => {
+    bookRef.current?.pageFlip()?.flipNext?.();
+  };
+
+  const prevPage = () => {
+    bookRef.current?.pageFlip()?.flipPrev?.();
+  };
+
+  // Tentukan ukuran dinamis
+  const bookWidth = isMobile ? 340 : 900;
+  const bookHeight = isMobile ? 480 : 1280;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <main className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4 md:p-8 overflow-hidden">
+      <h1 className="text-2xl md:text-3xl font-bold mb-4 text-gray-800 text-center">
+        📘 Guidebook Kompetisi Konten Kreator
+      </h1>
+
+      <div className="shadow-2xl rounded-xl bg-white flex flex-col items-center">
+        <HTMLFlipBook
+          ref={bookRef}
+          width={bookWidth}
+          height={bookHeight}
+          size="stretch"
+          minWidth={300}
+          maxWidth={1200}
+          minHeight={400}
+          maxHeight={1600}
+          showCover={true}
+          className="rounded-xl"
+          mobileScrollSupport={true}
+          usePortrait={true}
+          style={{
+            backgroundColor: "white",
+            boxShadow: "0 0 40px rgba(0,0,0,0.15)",
+          }}
+        >
+          {pages.map((page, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-center bg-white"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+              <Image
+                src={page}
+                alt={`Halaman ${index + 1}`}
+                width={bookWidth * 2}
+                height={bookHeight * 2}
+                className="object-contain w-full h-auto select-none"
+                priority={index === 0}
+                quality={100}
+              />
+            </div>
+          ))}
+        </HTMLFlipBook>
+      </div>
+
+      {/* Tombol Navigasi */}
+      <div className="flex gap-6 mt-6 flex-wrap justify-center">
+        <button
+          onClick={prevPage}
+          disabled={currentPage === 0}
+          className={`px-5 py-2 rounded-xl transition ${
+            currentPage === 0
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-gray-700 text-white hover:bg-gray-800"
+          }`}
+        >
+          ⬅️ Sebelumnya
+        </button>
+
+        <button
+          onClick={nextPage}
+          disabled={currentPage === pages.length - 1}
+          className={`px-5 py-2 rounded-xl transition ${
+            currentPage === pages.length - 1
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-blue-600 text-white hover:bg-blue-700"
+          }`}
+        >
+          Selanjutnya ➡️
+        </button>
+      </div>
+
+      <p className="mt-4 text-gray-600 text-sm">
+        Halaman {currentPage + 1} dari {pages.length}
+      </p>
+
+      <style jsx global>{`
+        html,
+        body {
+          overflow-x: hidden !important;
+        }
+        canvas {
+          touch-action: pan-y;
+        }
+      `}</style>
+    </main>
   );
 }
