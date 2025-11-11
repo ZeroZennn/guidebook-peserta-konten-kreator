@@ -6,10 +6,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // (opsional) bisa juga tambahkan ini untuk melewati lint error di Vercel
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+
 };
 
 export default nextConfig;
