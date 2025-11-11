@@ -27,27 +27,32 @@ export default function Home() {
   ];
 
   const bookRef = useRef<any>(null);
-  const [isMobile, setIsMobile] = useState(false);
 
-  // Deteksi layar mobile
+  const [isMobile, setIsMobile] = useState(false);
+  const [bookSize, setBookSize] = useState({ width: 900, height: 1200 });
+
+  // 🔹 Deteksi ukuran layar dan update ukuran buku
   useEffect(() => {
-    const checkScreen = () => setIsMobile(window.innerWidth <= 768);
-    checkScreen();
-    window.addEventListener("resize", checkScreen);
-    return () => window.removeEventListener("resize", checkScreen);
+    const updateSize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+
+      const width = mobile ? 360 : window.innerWidth * 0.3;
+      const height = mobile ? 520 : window.innerHeight * 0.85;
+
+      setBookSize({ width, height });
+    };
+
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
   }, []);
 
   const nextPage = () => bookRef.current?.pageFlip()?.flipNext?.();
   const prevPage = () => bookRef.current?.pageFlip()?.flipPrev?.();
 
-  // 📏 Ukuran besar: hampir fullscreen
-  const bookWidth = isMobile ? 360 : window.innerWidth * 0.30;
-  const bookHeight = isMobile ? 520 : window.innerHeight * 0.85;
-
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-gray-100 py-8 overflow-hidden">
-
-      {/* Buku Flip fullscreen-ish */}
       <div className="shadow-2xl rounded-2xl bg-white flex flex-col items-center justify-center">
         <div
           className="relative flex items-center justify-center"
@@ -58,8 +63,8 @@ export default function Home() {
         >
           <HTMLFlipBook
             ref={bookRef}
-            width={bookWidth}
-            height={bookHeight}
+            width={bookSize.width}
+            height={bookSize.height}
             size="fixed"
             minWidth={300}
             maxWidth={2500}
@@ -86,8 +91,8 @@ export default function Home() {
                 <Image
                   src={page}
                   alt={`Halaman ${index + 1}`}
-                  width={bookWidth * 2}
-                  height={bookHeight * 2}
+                  width={bookSize.width * 2}
+                  height={bookSize.height * 2}
                   className="object-contain w-full h-full select-none"
                   priority={index === 0}
                   quality={100}
